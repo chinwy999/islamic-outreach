@@ -1,0 +1,252 @@
+/* Qur'an data: the full 114-sūrah index (names, ayah counts, place of
+ * revelation) plus the full Arabic text and an English rendering of the
+ * meaning for a set of short sūrahs kept in the bundle so that reading,
+ * search and recitation work without any network dependency.
+ *
+ * Translations render the MEANING of the Qur'an. They are not the Qur'an. */
+
+export type Ayah = { n: number; ar: string; en: string };
+
+export type Surah = {
+  n: number;
+  ar: string;
+  translit: string;
+  en: string;
+  ayahs: number;
+  place: "M" | "Md";
+  text?: Ayah[];
+};
+
+type Row = [number, string, string, string, number, 0 | 1];
+
+const INDEX: Row[] = [
+  [1, "الفاتحة", "Al-Fātiḥah", "The Opening", 7, 0],
+  [2, "البقرة", "Al-Baqarah", "The Cow", 286, 1],
+  [3, "آل عمران", "Āl ʿImrān", "Family of Imran", 200, 1],
+  [4, "النساء", "An-Nisāʾ", "The Women", 176, 1],
+  [5, "المائدة", "Al-Māʾidah", "The Table Spread", 120, 1],
+  [6, "الأنعام", "Al-Anʿām", "The Cattle", 165, 0],
+  [7, "الأعراف", "Al-Aʿrāf", "The Heights", 206, 0],
+  [8, "الأنفال", "Al-Anfāl", "The Spoils of War", 75, 1],
+  [9, "التوبة", "At-Tawbah", "The Repentance", 129, 1],
+  [10, "يونس", "Yūnus", "Jonah", 109, 0],
+  [11, "هود", "Hūd", "Hud", 123, 0],
+  [12, "يوسف", "Yūsuf", "Joseph", 111, 0],
+  [13, "الرعد", "Ar-Raʿd", "The Thunder", 43, 1],
+  [14, "إبراهيم", "Ibrāhīm", "Abraham", 52, 0],
+  [15, "الحجر", "Al-Ḥijr", "The Rocky Tract", 99, 0],
+  [16, "النحل", "An-Naḥl", "The Bee", 128, 0],
+  [17, "الإسراء", "Al-Isrāʾ", "The Night Journey", 111, 0],
+  [18, "الكهف", "Al-Kahf", "The Cave", 110, 0],
+  [19, "مريم", "Maryam", "Mary", 98, 0],
+  [20, "طه", "Ṭā-Hā", "Ta-Ha", 135, 0],
+  [21, "الأنبياء", "Al-Anbiyāʾ", "The Prophets", 112, 0],
+  [22, "الحج", "Al-Ḥajj", "The Pilgrimage", 78, 1],
+  [23, "المؤمنون", "Al-Muʾminūn", "The Believers", 118, 0],
+  [24, "النور", "An-Nūr", "The Light", 64, 1],
+  [25, "الفرقان", "Al-Furqān", "The Criterion", 77, 0],
+  [26, "الشعراء", "Ash-Shuʿarāʾ", "The Poets", 227, 0],
+  [27, "النمل", "An-Naml", "The Ants", 93, 0],
+  [28, "القصص", "Al-Qaṣaṣ", "The Stories", 88, 0],
+  [29, "العنكبوت", "Al-ʿAnkabūt", "The Spider", 69, 0],
+  [30, "الروم", "Ar-Rūm", "The Romans", 60, 0],
+  [31, "لقمان", "Luqmān", "Luqman", 34, 0],
+  [32, "السجدة", "As-Sajdah", "The Prostration", 30, 0],
+  [33, "الأحزاب", "Al-Aḥzāb", "The Combined Forces", 73, 1],
+  [34, "سبأ", "Sabaʾ", "Sheba", 54, 0],
+  [35, "فاطر", "Fāṭir", "Originator", 45, 0],
+  [36, "يس", "Yā-Sīn", "Ya Sin", 83, 0],
+  [37, "الصافات", "Aṣ-Ṣāffāt", "Those Who Set The Ranks", 182, 0],
+  [38, "ص", "Ṣād", "The Letter Sad", 88, 0],
+  [39, "الزمر", "Az-Zumar", "The Troops", 75, 0],
+  [40, "غافر", "Ghāfir", "The Forgiver", 85, 0],
+  [41, "فصلت", "Fuṣṣilat", "Explained in Detail", 54, 0],
+  [42, "الشورى", "Ash-Shūrā", "The Consultation", 53, 0],
+  [43, "الزخرف", "Az-Zukhruf", "The Gold Adornments", 89, 0],
+  [44, "الدخان", "Ad-Dukhān", "The Smoke", 59, 0],
+  [45, "الجاثية", "Al-Jāthiyah", "The Crouching", 37, 0],
+  [46, "الأحقاف", "Al-Aḥqāf", "The Wind-Curved Sandhills", 35, 0],
+  [47, "محمد", "Muḥammad", "Muhammad", 38, 1],
+  [48, "الفتح", "Al-Fatḥ", "The Victory", 29, 1],
+  [49, "الحجرات", "Al-Ḥujurāt", "The Rooms", 18, 1],
+  [50, "ق", "Qāf", "The Letter Qaf", 45, 0],
+  [51, "الذاريات", "Adh-Dhāriyāt", "The Winnowing Winds", 60, 0],
+  [52, "الطور", "Aṭ-Ṭūr", "The Mount", 49, 0],
+  [53, "النجم", "An-Najm", "The Star", 62, 0],
+  [54, "القمر", "Al-Qamar", "The Moon", 55, 0],
+  [55, "الرحمن", "Ar-Raḥmān", "The Beneficent", 78, 1],
+  [56, "الواقعة", "Al-Wāqiʿah", "The Inevitable", 96, 0],
+  [57, "الحديد", "Al-Ḥadīd", "The Iron", 29, 1],
+  [58, "المجادلة", "Al-Mujādilah", "The Pleading Woman", 22, 1],
+  [59, "الحشر", "Al-Ḥashr", "The Exile", 24, 1],
+  [60, "الممتحنة", "Al-Mumtaḥanah", "She That is to be Examined", 13, 1],
+  [61, "الصف", "Aṣ-Ṣaff", "The Ranks", 14, 1],
+  [62, "الجمعة", "Al-Jumuʿah", "The Congregation", 11, 1],
+  [63, "المنافقون", "Al-Munāfiqūn", "The Hypocrites", 11, 1],
+  [64, "التغابن", "At-Taghābun", "Mutual Disillusion", 18, 1],
+  [65, "الطلاق", "Aṭ-Ṭalāq", "The Divorce", 12, 1],
+  [66, "التحريم", "At-Taḥrīm", "The Prohibition", 12, 1],
+  [67, "الملك", "Al-Mulk", "The Sovereignty", 30, 0],
+  [68, "القلم", "Al-Qalam", "The Pen", 52, 0],
+  [69, "الحاقة", "Al-Ḥāqqah", "The Reality", 52, 0],
+  [70, "المعارج", "Al-Maʿārij", "The Ascending Stairways", 44, 0],
+  [71, "نوح", "Nūḥ", "Noah", 28, 0],
+  [72, "الجن", "Al-Jinn", "The Jinn", 28, 0],
+  [73, "المزمل", "Al-Muzzammil", "The Enshrouded One", 20, 0],
+  [74, "المدثر", "Al-Muddaththir", "The Cloaked One", 56, 0],
+  [75, "القيامة", "Al-Qiyāmah", "The Resurrection", 40, 0],
+  [76, "الإنسان", "Al-Insān", "The Man", 31, 1],
+  [77, "المرسلات", "Al-Mursalāt", "The Emissaries", 50, 0],
+  [78, "النبأ", "An-Nabaʾ", "The Tidings", 40, 0],
+  [79, "النازعات", "An-Nāziʿāt", "Those Who Drag Forth", 46, 0],
+  [80, "عبس", "ʿAbasa", "He Frowned", 42, 0],
+  [81, "التكوير", "At-Takwīr", "The Overthrowing", 29, 0],
+  [82, "الانفطار", "Al-Infiṭār", "The Cleaving", 19, 0],
+  [83, "المطففين", "Al-Muṭaffifīn", "The Defrauding", 36, 0],
+  [84, "الانشقاق", "Al-Inshiqāq", "The Sundering", 25, 0],
+  [85, "البروج", "Al-Burūj", "The Mansions of the Stars", 22, 0],
+  [86, "الطارق", "Aṭ-Ṭāriq", "The Nightcomer", 17, 0],
+  [87, "الأعلى", "Al-Aʿlā", "The Most High", 19, 0],
+  [88, "الغاشية", "Al-Ghāshiyah", "The Overwhelming", 26, 0],
+  [89, "الفجر", "Al-Fajr", "The Dawn", 30, 0],
+  [90, "البلد", "Al-Balad", "The City", 20, 0],
+  [91, "الشمس", "Ash-Shams", "The Sun", 15, 0],
+  [92, "الليل", "Al-Layl", "The Night", 21, 0],
+  [93, "الضحى", "Aḍ-Ḍuḥā", "The Morning Hours", 11, 0],
+  [94, "الشرح", "Ash-Sharḥ", "The Relief", 8, 0],
+  [95, "التين", "At-Tīn", "The Fig", 8, 0],
+  [96, "العلق", "Al-ʿAlaq", "The Clot", 19, 0],
+  [97, "القدر", "Al-Qadr", "The Power", 5, 0],
+  [98, "البينة", "Al-Bayyinah", "The Clear Proof", 8, 1],
+  [99, "الزلزلة", "Az-Zalzalah", "The Earthquake", 8, 1],
+  [100, "العاديات", "Al-ʿĀdiyāt", "The Courser", 11, 0],
+  [101, "القارعة", "Al-Qāriʿah", "The Calamity", 11, 0],
+  [102, "التكاثر", "At-Takāthur", "The Rivalry in World Increase", 8, 0],
+  [103, "العصر", "Al-ʿAṣr", "The Declining Day", 3, 0],
+  [104, "الهمزة", "Al-Humazah", "The Traducer", 9, 0],
+  [105, "الفيل", "Al-Fīl", "The Elephant", 5, 0],
+  [106, "قريش", "Quraysh", "Quraysh", 4, 0],
+  [107, "الماعون", "Al-Māʿūn", "The Small Kindnesses", 7, 0],
+  [108, "الكوثر", "Al-Kawthar", "The Abundance", 3, 0],
+  [109, "الكافرون", "Al-Kāfirūn", "The Disbelievers", 6, 0],
+  [110, "النصر", "An-Naṣr", "The Divine Support", 3, 1],
+  [111, "المسد", "Al-Masad", "The Palm Fibre", 5, 0],
+  [112, "الإخلاص", "Al-Ikhlāṣ", "The Sincerity", 4, 0],
+  [113, "الفلق", "Al-Falaq", "The Daybreak", 5, 0],
+  [114, "الناس", "An-Nās", "Mankind", 6, 0],
+];
+
+const TEXT: Record<number, Ayah[]> = {
+  1: [
+    { n: 1, ar: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ", en: "In the name of God, the Most Merciful, the Most Compassionate." },
+    { n: 2, ar: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", en: "All praise belongs to God, Lord of all the worlds," },
+    { n: 3, ar: "الرَّحْمَٰنِ الرَّحِيمِ", en: "the Most Merciful, the Most Compassionate," },
+    { n: 4, ar: "مَالِكِ يَوْمِ الدِّينِ", en: "Master of the Day of Judgement." },
+    { n: 5, ar: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", en: "You alone we worship, and You alone we ask for help." },
+    { n: 6, ar: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ", en: "Guide us along the straight path," },
+    { n: 7, ar: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ", en: "the path of those You have blessed, not of those who earned anger, nor of those who went astray." },
+  ],
+  93: [
+    { n: 1, ar: "وَالضُّحَىٰ", en: "By the morning brightness," },
+    { n: 2, ar: "وَاللَّيْلِ إِذَا سَجَىٰ", en: "and by the night when it grows still," },
+    { n: 3, ar: "مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَىٰ", en: "your Lord has neither left you nor turned against you." },
+    { n: 4, ar: "وَلَلْآخِرَةُ خَيْرٌ لَّكَ مِنَ الْأُولَىٰ", en: "What is to come is better for you than what has gone," },
+    { n: 5, ar: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ", en: "and your Lord will give to you, and you will be content." },
+    { n: 6, ar: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَىٰ", en: "Did He not find you an orphan and shelter you?" },
+    { n: 7, ar: "وَوَجَدَكَ ضَالًّا فَهَدَىٰ", en: "And find you searching, and guide you?" },
+    { n: 8, ar: "وَوَجَدَكَ عَائِلًا فَأَغْنَىٰ", en: "And find you in need, and enrich you?" },
+    { n: 9, ar: "فَأَمَّا الْيَتِيمَ فَلَا تَقْهَرْ", en: "So do not oppress the orphan," },
+    { n: 10, ar: "وَأَمَّا السَّائِلَ فَلَا تَنْهَرْ", en: "nor drive away the one who asks," },
+    { n: 11, ar: "وَأَمَّا بِنِعْمَةِ رَبِّكَ فَحَدِّثْ", en: "and speak of the blessing of your Lord." },
+  ],
+  94: [
+    { n: 1, ar: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ", en: "Have We not opened up your heart for you," },
+    { n: 2, ar: "وَوَضَعْنَا عَنكَ وِزْرَكَ", en: "and relieved you of the burden" },
+    { n: 3, ar: "الَّذِي أَنقَضَ ظَهْرَكَ", en: "that weighed down your back," },
+    { n: 4, ar: "وَرَفَعْنَا لَكَ ذِكْرَكَ", en: "and raised high your renown?" },
+    { n: 5, ar: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا", en: "So truly, with hardship comes ease." },
+    { n: 6, ar: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", en: "Truly, with hardship comes ease." },
+    { n: 7, ar: "فَإِذَا فَرَغْتَ فَانصَبْ", en: "So when you are free, work on," },
+    { n: 8, ar: "وَإِلَىٰ رَبِّكَ فَارْغَب", en: "and turn to your Lord with longing." },
+  ],
+  95: [
+    { n: 1, ar: "وَالتِّينِ وَالزَّيْتُونِ", en: "By the fig and the olive," },
+    { n: 2, ar: "وَطُورِ سِينِينَ", en: "and Mount Sinai," },
+    { n: 3, ar: "وَهَٰذَا الْبَلَدِ الْأَمِينِ", en: "and this secure city," },
+    { n: 4, ar: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ", en: "We created the human being in the finest form," },
+    { n: 5, ar: "ثُمَّ رَدَدْنَاهُ أَسْفَلَ سَافِلِينَ", en: "then reduced him to the lowest of the low," },
+    { n: 6, ar: "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ", en: "except those who believe and do good — for them is a reward without end." },
+    { n: 7, ar: "فَمَا يُكَذِّبُكَ بَعْدُ بِالدِّينِ", en: "What then makes you deny the Judgement?" },
+    { n: 8, ar: "أَلَيْسَ اللَّهُ بِأَحْكَمِ الْحَاكِمِينَ", en: "Is God not the most just of judges?" },
+  ],
+  97: [
+    { n: 1, ar: "إِنَّا أَنزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ", en: "We sent it down on the Night of Decree." },
+    { n: 2, ar: "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ", en: "And what will make you realise what the Night of Decree is?" },
+    { n: 3, ar: "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ", en: "The Night of Decree is better than a thousand months." },
+    { n: 4, ar: "تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍ", en: "The angels and the Spirit descend in it by their Lord's permission with every decree." },
+    { n: 5, ar: "سَلَامٌ هِيَ حَتَّىٰ مَطْلَعِ الْفَجْرِ", en: "Peace it is, until the break of dawn." },
+  ],
+  103: [
+    { n: 1, ar: "وَالْعَصْرِ", en: "By the passage of time," },
+    { n: 2, ar: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ", en: "the human being is surely in loss," },
+    { n: 3, ar: "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ", en: "except those who believe, do good, and urge one another to truth and to patience." },
+  ],
+  108: [
+    { n: 1, ar: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ", en: "We have surely given you abundance." },
+    { n: 2, ar: "فَصَلِّ لِرَبِّكَ وَانْحَرْ", en: "So pray to your Lord and sacrifice." },
+    { n: 3, ar: "إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ", en: "It is the one who hates you who is cut off." },
+  ],
+  109: [
+    { n: 1, ar: "قُلْ يَا أَيُّهَا الْكَافِرُونَ", en: "Say: O you who reject faith," },
+    { n: 2, ar: "لَا أَعْبُدُ مَا تَعْبُدُونَ", en: "I do not worship what you worship," },
+    { n: 3, ar: "وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", en: "nor do you worship what I worship." },
+    { n: 4, ar: "وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ", en: "I will not worship what you have worshipped," },
+    { n: 5, ar: "وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", en: "nor will you worship what I worship." },
+    { n: 6, ar: "لَكُمْ دِينُكُمْ وَلِيَ دِينِ", en: "You have your religion, and I have mine." },
+  ],
+  110: [
+    { n: 1, ar: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ", en: "When the help of God comes, and the victory," },
+    { n: 2, ar: "وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا", en: "and you see people entering the religion of God in crowds," },
+    { n: 3, ar: "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ ۚ إِنَّهُ كَانَ تَوَّابًا", en: "then glorify your Lord with praise and seek His forgiveness. He is ever ready to accept repentance." },
+  ],
+  112: [
+    { n: 1, ar: "قُلْ هُوَ اللَّهُ أَحَدٌ", en: "Say: He is God, the One." },
+    { n: 2, ar: "اللَّهُ الصَّمَدُ", en: "God, the Eternal Refuge." },
+    { n: 3, ar: "لَمْ يَلِدْ وَلَمْ يُولَدْ", en: "He does not beget, nor was He begotten," },
+    { n: 4, ar: "وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ", en: "and there is none comparable to Him." },
+  ],
+  113: [
+    { n: 1, ar: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", en: "Say: I seek refuge in the Lord of the daybreak," },
+    { n: 2, ar: "مِن شَرِّ مَا خَلَقَ", en: "from the harm of what He created," },
+    { n: 3, ar: "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ", en: "from the harm of darkness as it settles," },
+    { n: 4, ar: "وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ", en: "from the harm of those who blow on knots," },
+    { n: 5, ar: "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ", en: "and from the harm of an envier when he envies." },
+  ],
+  114: [
+    { n: 1, ar: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ", en: "Say: I seek refuge in the Lord of mankind," },
+    { n: 2, ar: "مَلِكِ النَّاسِ", en: "the Sovereign of mankind," },
+    { n: 3, ar: "إِلَٰهِ النَّاسِ", en: "the God of mankind," },
+    { n: 4, ar: "مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ", en: "from the harm of the whispering, retreating one," },
+    { n: 5, ar: "الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ", en: "who whispers in the hearts of mankind," },
+    { n: 6, ar: "مِنَ الْجِنَّةِ وَالنَّاسِ", en: "from among the jinn and mankind." },
+  ],
+};
+
+export const SURAHS: Surah[] = INDEX.map(([n, ar, translit, en, ayahs, place]) => ({
+  n,
+  ar,
+  translit,
+  en,
+  ayahs,
+  place: place === 0 ? "M" : "Md",
+  text: TEXT[n],
+}));
+
+export const BUNDLED = SURAHS.filter((s) => s.text);
+
+/** Recitation stream per sūrah (Mishary al-ʿAfāsī). Loaded on demand;
+ *  if it fails the reader shows an explicit, calm error state. */
+export const recitationUrl = (n: number) =>
+  `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${n}.mp3`;
+
+export const BISMILLAH = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
